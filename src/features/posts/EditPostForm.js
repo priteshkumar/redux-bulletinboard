@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 //import { nanoid } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { selectPostById, updatePost } from "./postsSlice";
+import { selectPostById, updatePost, deletePost } from "./postsSlice";
 import { selectAllUsers } from "../users/usersSlice";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -65,6 +65,27 @@ function EditPostForm() {
     }
   }
 
+  async function handleDeletePost() {
+    if (canSave) {
+      try {
+        setAddRequestStatus("pending");
+        await dispatch(
+          deletePost({
+            id: post.id,
+          })
+        ).unwrap();
+        setTitle("");
+        setContent("");
+        setUserId("");
+        navigate("/");
+      } catch (err) {
+        console.log("failed to delete the post", err);
+      } finally {
+        setAddRequestStatus("idle");
+      }
+    }
+  }
+
   const userOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
       {user.name}
@@ -113,6 +134,9 @@ function EditPostForm() {
         </div>
         <button type="button" onClick={savePost}>
           Save Post
+        </button>
+        <button type="button" onClick={handleDeletePost}>
+          Delete Post
         </button>
       </form>
     </section>
